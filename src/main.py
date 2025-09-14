@@ -1,26 +1,24 @@
 from vars import CATEGORIES
 from mread import read, readdir
 import pandas as pd
-from features import calcAggregateFeatures
+from features import calc_aggregate_features
+from readydata import ready_transactions, ready_transfers, ready_clients, merge_data
 
 def main():
-    data_clients = read('clients.csv')
-    data_transfers = readdir('transfers')
-    data_transactions = readdir('transactions')
+    df_clients = read('clients.csv')
+    df_transactions = readdir('transactions')
+    df_transfers = readdir('transfers')
 
-    data_transactions['date'] = pd.to_datetime(data_transactions['date'], errors='coerce')
-    data_transactions['day'] = data_transactions['date'].dt.day
-    data_transactions['month'] = data_transactions['date'].dt.month
-    data_transactions['year'] = data_transactions['date'].dt.year
-    data_transactions['time'] = data_transactions['date'].dt.time
-    data_transactions['hour'] = data_transactions['date'].dt.hour
-    data_transactions['minute'] = data_transactions['date'].dt.minute
-    data_transactions['second'] = data_transactions['date'].dt.second
     
-    data_transfers['date'] = pd.to_datetime(data_transfers['date'], errors='coerce')
+    data = merge_data(calc_aggregate_features(ready_transactions(df_transactions), 'category'), calc_aggregate_features(ready_transfers(df_transfers), 'type'))
+    data = merge_data(data, ready_clients(df_clients))
 
-    calcAggregateFeatures(data_transactions).to_csv('output.csv', encoding='utf-8-sig')
-    calcAggregateFeatures(data_transfers).to_csv('output.csv', encoding='utf-8-sig')
+    
+
+    data.to_csv('out.csv', encoding='utf-8-sig')
+    
+    # calc_aggregate_features(df_transactions, 'category').to_csv('output_transactions.csv', encoding='utf-8-sig')
+    # calc_aggregate_features(df_transfers, 'type').to_csv('output_transfers.csv', encoding='utf-8-sig')
     
 if __name__ == "__main__":
     main()
