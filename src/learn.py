@@ -3,7 +3,8 @@ from features import calc_aggregate_features
 from readydata import ready_transactions, ready_transfers, ready_clients, merge_data
 
 import lightgbm as lgb
-import pandas as pd
+import joblib
+from vars import ALL_CATS, ALL_TRANSFS
 
 def learn():
     df_clients = read('clients.csv', frm="learn")
@@ -12,7 +13,7 @@ def learn():
 
     targets = df_transactions[['client_code', 'product']].drop_duplicates().rename(columns={'product': 'target'})
 
-    data = merge_data(calc_aggregate_features(ready_transactions(df_transactions), 'category'), calc_aggregate_features(ready_transfers(df_transfers), 'type'))
+    data = merge_data(calc_aggregate_features(ready_transactions(df_transactions), 'category', ALL_CATS), calc_aggregate_features(ready_transfers(df_transfers), 'type', ALL_TRANSFS))
     data = merge_data(data, ready_clients(df_clients))
     data = merge_data(data, targets)
 
@@ -30,6 +31,8 @@ def learn():
     x = x.drop(columns=["client_code"])
     y = data["target"]
 
+    x.to_csv("x2.csv", index=False, encoding="utf-8-sig")
+
     model = lgb.LGBMClassifier(
         boosting_type="gbdt",
         objective="multiclass",
@@ -40,11 +43,4 @@ def learn():
 
     model.fit(x, y, categorical_feature=['status', 'city'])
 
-    y_pred = model.predict(x)
-
-    preds = pd.DataFrame({
-        "client_code": client_codes,
-        "pred": y_pred
-    })
-
-    preds.to_csv("preds.csv", index=False, encoding="utf-8-sig")
+    joblib.dump(model, "model.pkl")
