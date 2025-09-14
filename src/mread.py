@@ -2,10 +2,11 @@ import pandas as pd
 import glob
 
 def read(file: str, frm: str = 'data') -> pd.DataFrame:
-    return pd.read_csv(f'{frm}/{file}', dtype={"client_code": str})
+    print(frm,file)
+    return pd.read_csv(f'{frm}\\{file}')
 
 def readdir(dir: str, frm: str = 'data') -> pd.DataFrame:
     files: list = glob.glob(f'./{frm}/{dir}/*.csv')
-    datas: list = [read(file.replace(f'./{frm}/', '')) for file in files]
+    datas: list = [read(file.replace(f'./{frm}/', ''), frm=frm) for file in files]
     result: pd.DataFrame = pd.concat(datas, ignore_index=True)
     return result
