@@ -16,7 +16,6 @@ def main():
                 print("/data/transfers")
             case _:
                 return
-    while True
             
                 
             
