@@ -2,18 +2,21 @@ from learnandsavemodel import learn
 
 def main():
     while True:
-        print(f'q - выход\nn - начать обучение модели\nl - загрузить\np - предсказать')
+        print(f'какую модель использовать')
+        print(f'1 - выход\n2 - начать обучение модели\n3 - использовать обученую модель')
         match input():
-            case 'q':
+            case '1':
                 return
-            case 'n':
+            case '2':
                 learn()
-            case 'l':
-                
-            case 'p':
-                
-            case _:
                 continue
+            case '3':
+                print("Чтение из папок")
+                print("/data/transactions")
+                print("/data/transfers")
+            case _:
+                return
+    while True
             
                 
             
